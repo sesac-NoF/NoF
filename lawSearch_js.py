@@ -38,4 +38,4 @@ for i in range(451,676):
     print('error')
 df = pd.DataFrame(data=data, columns=['판례일련번호','사건명','사건번호','선고일자','법원명','사건종류명','판례상세링크'])
 
-df.to_csv('data/df_data.csv', index=False)
+df.to_csv('data/list_API.csv', index=False)

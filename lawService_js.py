@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
 
-df = pd.read_csv('data/df_data.csv')
+df = pd.read_csv('data/list_API.csv')
 
 OC = 'younwjdtjr'
 target = 'prec'
@@ -45,4 +45,4 @@ for i in range(1,df['판례일련번호'].value_counts().sum()+1):
     print(i)
     
 df2 = pd.DataFrame(data=data, columns=['판례정보일련번호','사건번호','선고','판결유형','판시사항','판결요지','참조조문','참조판례','판례내용'])
-df2.to_csv('data/df_data2.csv', index=False)
+df2.to_csv('data/main_API.csv', index=False)
