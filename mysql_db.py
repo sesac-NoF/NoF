@@ -12,6 +12,7 @@ host = host
 port = port
 database = database
 
+
 # MySQL 데이터베이스 연결 설정
 engine = create_engine(f'mysql+pymysql://{user}:{password}@{host}:{port}/{database}', echo=False)
 
