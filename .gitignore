@@ -1,4 +1,5 @@
 data/
-Labor_precedent_EDA/
+Labor_precedent_EDA/*.ipynb
+Labor_precedent_EDA/*.txt
 lda_visualization.html
 /db_info.py
