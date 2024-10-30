@@ -1,2 +1,6 @@
 data/
 /db_info.py
+Labor_precedent_EDA/
+environment.yml
+lda_visualization.html
+requirements.txt
