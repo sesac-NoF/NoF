@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import time
 import ast
+from urllib.parse import quote
 
 # 전체 배경색 설정
 page_bg = """
@@ -109,10 +110,12 @@ elif st.session_state['page'] == 'inheritance_page':
             with tab1:
                 st.header("사용자 키워드와 관련된 사건명")
                 for _, row in df_results.iterrows():
+                    사건번호_encoded = quote(row['사건번호'])  # 사건번호 인코딩
+                    # 사건번호를 클릭하면 소요일자2.py로 이동하도록 링크 생성
                     if pd.isna(row['사건명']):
-                        st.write(f"사건번호: {row['사건번호']}")
+                        st.write(f"[사건번호: {row['사건번호']}](/pages/page.py?case_number={사건번호_encoded})")
                     else:
-                        st.write(f"사건번호: {row['사건번호']}, 사건명: {row['사건명']}")
+                        st.write(f"[사건번호: {row['사건번호']}, 사건명: {row['사건명']}](/pages/page.py?case_number={사건번호_encoded})")
             
             with tab2:
                 st.header("참조조문")
