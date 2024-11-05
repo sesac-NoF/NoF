@@ -6,3 +6,4 @@ lda_visualization.html
 /db_info.py
 environment.yml
 requirements.txt
+__pycache__/
