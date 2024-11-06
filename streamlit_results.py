@@ -111,11 +111,14 @@ elif st.session_state['page'] == 'inheritance_page':
                 st.header("사용자 키워드와 관련된 사건명")
                 for _, row in df_results.iterrows():
                     사건번호_encoded = quote(row['사건번호'])  # 사건번호 인코딩
-                    # 사건번호를 클릭하면 소요일자2.py로 이동하도록 링크 생성
+                    판례일련번호_encoded = quote(str(row['판례일련번호'])) # 판례일련번호 인코딩
+                    # 사건번호를 클릭하면 2_page.py로 이동하도록 링크 생성
                     if pd.isna(row['사건명']):
-                        st.write(f"[사건번호: {row['사건번호']}](/pages/page.py?case_number={사건번호_encoded})")
+                        # st.write(f"[go to page 3](3?param={value})")/
+                        st.write(f"[사건번호: {row['사건번호']}](/3?case_number={사건번호_encoded}&case_serial={판례일련번호_encoded})")
+                        # st.button('1')
                     else:
-                        st.write(f"[사건번호: {row['사건번호']}, 사건명: {row['사건명']}](/pages/page.py?case_number={사건번호_encoded})")
+                        st.write(f"[사건번호: {row['사건번호']}, 사건명: {row['사건명']}](/3?case_number={사건번호_encoded}&case_serial={판례일련번호_encoded})")
             
             with tab2:
                 st.header("참조조문")
