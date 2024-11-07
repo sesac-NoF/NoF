@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from collections import Counter
+import requests
 from streamlit_elements import dashboard, mui, elements
 
 # 쿼리 파라미터 받기
@@ -13,7 +14,7 @@ case_number = st.query_params.get("case_number", "")
 case_name = st.query_params.get("case_name", "사건명 없음")
 
 # 데이터 로딩
-cluster_1 = pd.read_csv('cluster1.csv')
+cluster_1 = pd.read_csv('data/cluster1.csv')
 
 # '선고일자' 칼럼을 datetime 형식으로 변환
 cluster_1['선고일자'] = pd.to_datetime(cluster_1['선고일자'])
@@ -38,33 +39,37 @@ with elements("dashboard"):  # 'dashboard'라는 프레임으로 요소를 구�
     # 대시보드 기본 레이아웃 정의
     layout = [
         # 사건명과 SAVE 버튼을 위한 첫 번째 항목
-        dashboard.Item("first_item", 0, 0, 3, 2),  
+        dashboard.Item("first_item", 0, 0, 3, 2),
         # 연도별 사건 수를 표시하는 bar_chart 항목
-        dashboard.Item("second_item", 3, 0, 3, 2),
+        dashboard.Item("second_item", 0, 3, 3, 2),
     ]
 
     # 대시보드 그리드 레이아웃 구성
     with dashboard.Grid(layout):  # 'elements' 내에서 dashboard.Grid 사용
-        # 첫 번째 아이템: 사건명과 SAVE 버튼
-        with mui.Paper("first_item", key="first_item"):
-            col1, col2 = st.columns([3, 1])
-            col1.write(f"사건명: {case_name}")  # 사건명 텍스트
-            on = col2.checkbox("SAVE")  # SAVE 체크박스
+        mui.Paper("first_item", key='first_item')
+        
+        mui.Paper("second_item", key='second_item')
+        
+        # # 첫 번째 아이템: 사건명과 SAVE 버튼
+        # with mui.Paper("first_item", key="first_item"):
+        #     col= st.columns((3, 1), gap="medium")
+        #     col[0].write(f"사건명: {case_name}")  # 사건명 텍스트
+        #     on = col[1].checkbox("SAVE")  # SAVE 체크박스
             
-            # SAVE 버튼 상태에 따라 session_state 값 설정
-            if on:
-                if 'rating_value' not in st.session_state:
-                    st.session_state.rating_value = 700  # 초기값 설정
-                st.session_state.rating_value += 1  # 값 증가
-            else:
-                st.session_state.rating_value = 701  # 취소 시 값 리셋
+        #     # SAVE 버튼 상태에 따라 session_state 값 설정
+        #     if on:
+        #         if 'rating_value' not in st.session_state:
+        #             st.session_state.rating_value = 700  # 초기값 설정
+        #         st.session_state.rating_value += 1  # 값 증가
+        #     else:
+        #         st.session_state.rating_value = 701  # 취소 시 값 리셋
 
-        # 두 번째 아이템: bar_chart
-        with mui.Paper("second_item", key="second_item"):
-            # 연도별 사건 수 계산
-            yearly_counts = cluster_1.groupby(cluster_1['선고일자'].dt.year).size()
-            st.write("연도별 관련사건 선고수")
-            st.bar_chart(data=yearly_counts, width=400, height=200)
+        # # 두 번째 아이템: bar_chart
+        # with mui.Paper("second_item", key="second_item"):
+        #     # 연도별 사건 수 계산
+        #     yearly_counts = cluster_1.groupby(cluster_1['선고일자'].dt.year).size()
+        #     st.write("연도별 관련사건 선고수")
+        #     st.bar_chart(data=yearly_counts, width=400, height=200)
 
 # ** 별도의 섹션으로 Metric과 Heatmap을 배치 **
 
@@ -76,19 +81,24 @@ with elements("metrics_and_heatmap"):  # 별도의 프레임으로 구성
     ]
 
     # 대시보드 그리드 레이아웃 구성
+    col = st.columns((1,1), gap="medium")
     with dashboard.Grid(layout_2):  # 'elements' 내에서 dashboard.Grid 사용
+        with col[0]:
+            with mui.Paper("metric_item", key="metric_item"):
+                st.metric(label="✅ 판례 저장수", value=st.session_state.rating_value)
         # 첫 번째 항목: Metric
-        with mui.Paper("metric_item", key="metric_item"):
-            col1, col2 = st.columns([2.5, 1.5])
-            st.metric(label="✅ 판례 저장수", value=st.session_state.rating_value)
+        # with mui.Paper("metric_item", key="metric_item"):
+        #     col1, col2 = st.columns([2.5, 1.5])
+        #     st.metric(label="✅ 판례 저장수", value=st.session_state.rating_value)
 
         # 두 번째 항목: Heatmap
-        with mui.Paper("heatmap_item", key="heatmap_item"):
-            # 히트맵 그리기
-            plt.figure(figsize=(8, 2))  # 가로로 긴 히트맵 크기 설정
-            sns.heatmap(heatmap_data, annot=True, cmap="Blues", cbar=False, xticklabels=weekday_order)
-            st.write("요일별 선고수")
-            st.pyplot(plt)
+        with col[1]:
+            with mui.Paper("heatmap_item", key="heatmap_item"):
+                # 히트맵 그리기
+                plt.figure(figsize=(8, 2))  # 가로로 긴 히트맵 크기 설정
+                sns.heatmap(heatmap_data, annot=True, cmap="Blues", cbar=False, xticklabels=weekday_order)
+                st.write("요일별 선고수")
+                st.pyplot(plt)
 
 
 

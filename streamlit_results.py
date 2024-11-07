@@ -113,7 +113,7 @@ elif st.session_state['page'] == 'inheritance_page':
                     사건번호_encoded = quote(row['사건번호'])  # 사건번호 인코딩
                     판례일련번호_encoded = quote(str(row['판례일련번호'])) # 판례일련번호 인코딩
                     if pd.isna(row['사건명']):
-                        사건명_encoded = 없음
+                        사건명_encoded = '없음'
                     else:
                         사건명_encoded = quote(row['사건명'])
                     # 사건번호를 클릭하면 2_page.py로 이동하도록 링크 생성
