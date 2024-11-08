@@ -6,6 +6,7 @@ import time
 import ast
 from urllib.parse import quote
 
+
 # 전체 배경색 설정
 page_bg = """
 <style> 
@@ -21,7 +22,7 @@ st.markdown(page_bg, unsafe_allow_html=True)
 
 
 # 데이터 설정
-keywordsdata = {
+keywordsdata = pd.DataFrame({
     '주제': [
         '상속 및 재산 평가', '부동산 소유권 및 취득', '부동산 상속 및 사망 관련',
         '부동산 등기 및 소유권 이전', '손해배상 및 사망 보상', '농지 및 경작',
@@ -39,7 +40,7 @@ keywordsdata = {
         ['상속', '재산', '분할', '유류분', '상속인', '부동산', '민법', '한정승인', '피상', '포기'],
         ['보험', '보험금', '계약', '지급', '망인', '보험료', '자동차', '연금', '수익', '상해']
     ]
-}
+})
 
 # 미리저장한 결과 CSV 파일 불러오기
 inheritance_results = pd.read_csv('inheritance_results.csv')
@@ -113,7 +114,7 @@ elif st.session_state['page'] == 'inheritance_page':
                     사건번호_encoded = quote(row['사건번호'])  # 사건번호 인코딩
                     판례일련번호_encoded = quote(str(row['판례일련번호'])) # 판례일련번호 인코딩
                     if pd.isna(row['사건명']):
-                        사건명_encoded = 없음
+                        사건명_encoded = "없음"
                     else:
                         사건명_encoded = quote(row['사건명'])
                     # 사건번호를 클릭하면 2_page.py로 이동하도록 링크 생성
