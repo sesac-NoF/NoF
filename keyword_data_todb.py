@@ -6,15 +6,15 @@ from db_info import user, password, host, port, database
 
 ####pandas dataframe에서는 불러올때 타입을 기본str로 불러와서 긴내용의 데이터삽입을 하려면 dtype을 설정해줘야함####
 dtype = {
-    '판례내용' : LONGTEXT,
+    '판례정보일련번호' : TEXT,
+    '사건번호': TEXT,
+    '선고': TEXT,
+    '판결유형': TEXT,
     '판시사항': TEXT,
     '판결요지': TEXT,
     '참조조문': TEXT,
     '참조판례': TEXT,
-    '판례내용_이유': LONGTEXT,
-    '판례내용_상단': LONGTEXT,
-    '판례내용_이유_전처리': LONGTEXT,
-    '판례내용_이유_불용어제거': LONGTEXT
+    '판례내용': LONGTEXT,
 }
 #판례내용_이유,판례내용_이유(전처리),판례내용_이유(불용어제거),클러스터,키워드
 
@@ -30,7 +30,7 @@ database = database
 # df_fraud = pd.read_csv('data/사기_본문2.csv')
 # df_inheritance = pd.read_csv('data/상속_본문2.csv')
 # df_labor = pd.read_csv('data/근로_본문2.csv')
-df_fraud_keyword = pd.read_csv('data/df_fraud_keyword.csv')
+fraud_content = pd.read_csv('data/사기_본문2.csv')
 
 # MySQL 데이터베이스 연결 설정
 engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
@@ -40,7 +40,7 @@ engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{databa
 # df_fraud.to_sql('fraud_content', con=engine, if_exists='replace', index=False, dtype=dtype)
 # df_inheritance.to_sql('inheritance_content', con=engine, if_exists='replace', index=False, dtype=dtype)
 # df_labor.to_sql('labor_content', con=engine, if_exists='replace', index=False, dtype=dtype)
-df_fraud_keyword.to_sql('fraud_keyword', con=engine, if_exists='replace', index=False, dtype=dtype)
+fraud_content.to_sql('fraud_content', con=engine, if_exists='replace', index=False, dtype=dtype)
 
 # 연결 닫기
 engine.dispose()
