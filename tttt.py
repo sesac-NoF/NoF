@@ -5,6 +5,9 @@ import time
 from urllib.parse import quote
 from db_info import user, password, host, port, database
 import mysql.connector
+from collections import Counter
+import re
+
 
 # # 데이터 예시 (가상의 데이터 생성)
 # df = pd.DataFrame({
@@ -104,9 +107,7 @@ if st.button("확인") and selected_keyword:
     # inheritance_results에서 주제,키워드로 필터링
     df_results = inheritance_results[(inheritance_results['주제'] == subject) 
                                         & (inheritance_results['키워드'] == selected_keyword)].sort_values(by='유사도', ascending=False).head(10)
-    df_laws = inheritance_results[(inheritance_results['주제'] == subject)
-                                  & (inheritance_results['키워드'] == selected_keyword)]
-    # 결과가 있으면 탭에 표시
+    df_laws = inheritance_results[(inheritance_results['주제'] == subject)]# 결과가 있으면 탭에 표시
     if not df_results.empty:
         tab1, tab2 = st.tabs(["판례검색결과", "참조조문"])
         
@@ -129,35 +130,68 @@ if st.button("확인") and selected_keyword:
                     st.write(f"[사건번호: {row['사건번호']}, 사건명: {row['사건명']}](/3?case_number={사건번호_encoded}&case_serial={판례일련번호_encoded}&case_name={사건명_encoded})")
         with tab2:
             st.header("참조조문")
-            st.write("참조조문 관련 내용이 여기에 표시됩니다.")
-            all_results = []
-            for _, row in df_laws.iterrows():
-                판례일련번호_encoded = quote(str(row['판례일련번호'])) # 판례일련번호 인코딩
-                db_connection = mysql.connector.connect(
-                    host = host,
-                    user = user,
-                    password = password,
-                    database = database,
-                    port = port
-                )
-                cursor = db_connection.cursor()
-                cursor.execute(f"SELECT 판례정보일련번호, 참조조문_전처리 as 참조조문 FROM inheritance_case_clause_preprocessed where 판례정보일련번호 = {판례일련번호_encoded}")
-                result = cursor.fetchall()
-                if result:
-                    df_inheritance = pd.DataFrame(result, columns = [i[0] for i in cursor.description])
-                    all_results.append(df_inheritance)
-                cursor.close()
-                db_connection.close()
-            results_all = pd.concat(all_results, ignore_index=True)
-            results_all
-            참조조문_couts = results_all['참조조문'].value_counts().reset_index()
-            참조조문_couts.columns = ['참조조문','빈도']
+            cluster_num = topic_cluster_map.get(subject) # 선택한 클러스터 번호 추출
+            판례일련번호_encoded = quote(str(row['판례일련번호'])) # 판례일련번호 인코딩
+            법령_url = 'https://www.law.go.kr/법령/'
+            # 판례일련번호로 데이터베이스에서 불러오기
+            db_connection = mysql.connector.connect(
+                host = host,
+                user = user,
+                password = password,
+                database = database,
+                port = port
+            )
+            cursor = db_connection.cursor()
+            # 불러오는 컬럼 판례일련번호, 클러스터, 키워드, 참조조문_파라미터
+            cursor.execute(
+                f"""
+                SELECT a.판례일련번호, a.클러스터, a.키워드, b.참조조문_파라미터 as 참조조문 
+                FROM inheritance_keyword as a 
+                JOIN inheritance_case_clause_preprocessed as b 
+                    ON a.판례일련번호 = b.판례정보일련번호 
+                WHERE a.클러스터 ={cluster_num} 
+                """)
+            result = cursor.fetchall()
+            inheritance_참조조문 = pd.DataFrame(result, columns = [i[0] for i in cursor.description])
+            cursor.close()
+            db_connection.close()
             
+            # inheritance_참조조문의 각 행에 대해 참조조문을 쉼표로 분리하여 누적
+            참조조문_counts = []
+            for i in range(len(inheritance_참조조문)):
+                참조조문 = inheritance_참조조문['참조조문'].iloc[i].split(',')
+                상세링크 = 법령_url+inheritance_참조조문['참조조문']
+                참조조문_counts.extend([item.strip().replace('/', ' ') for item in 참조조문])  # 각 조문을 개별 항목으로 추가
+            
+            # Counter를 사용하여 요소별 빈도 계산
+            참조조문_counts = Counter(참조조문_counts)
+            
+            # 참조조문 빈도수를 계산하고 데이터프레임으로 변환
+            df_참조조문_counts = pd.DataFrame(list(참조조문_counts.items()), columns=['참조조문이름','참조횟수'])
+            df_참조조문_counts = df_참조조문_counts[df_참조조문_counts['참조조문이름'] != '참조조문 없음']
+            # 공백 제거된 이름과 원래 이름을 매핑할 딕셔너리 생성
+            name_mapping = {name.replace(' ', ''): name for name in df_참조조문_counts['참조조문이름'].unique()}
+            
+            df_참조조문_counts['상세링크'] = df_참조조문_counts['참조조문이름'].apply(
+                lambda x: 법령_url + x.replace(' 제', '/제')
+            )
+            
+            df_참조조문2 = df_참조조문_counts
+            
+            df_참조조문_counts['참조조문이름'] = df_참조조문_counts['참조조문이름'].apply(lambda x: x.replace(' ', ''))
+
+            df_참조조문2 = (
+                df_참조조문_counts.groupby('참조조문이름', as_index=False)
+                .agg({'참조횟수': 'sum', '상세링크': 'first'})
+                .sort_values(by='참조횟수', ascending=False)
+            )
+            df_참조조문2['참조조문이름'] = df_참조조문2['참조조문이름'].map(name_mapping)
+
             with st.container():
-                st.write('참조조문 빈도')
-                st.dataframe(참조조문_couts)
-                
-                st.bar_chart(참조조문_couts.set_index('참조조문'))
+                st.write('참조조문 수', len(df_참조조문2))
+                st.dataframe(df_참조조문2) 
+                st.bar_chart(df_참조조문2.set_index('참조조문이름')['참조횟수'][:10])
+
 
     else:
         st.warning("선택한 주제와 키워드에 대한 결과가 없습니다.")
