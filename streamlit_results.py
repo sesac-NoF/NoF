@@ -84,7 +84,7 @@ elif st.session_state['page'] == 'inheritance_page':
     subject = st.selectbox("주제를 선택하세요:", keywordsdata['주제'])
 
     # 선택된 주제에 따른 키워드 버튼 표시
-    selected_index = keywordsdata['주제'].index(subject)
+    selected_index =  keywordsdata[keywordsdata['주제'] == subject].index[0]
     keywords = keywordsdata['키워드'][selected_index]
     
     # 라디오 버튼으로 키워드 선택
@@ -109,7 +109,7 @@ elif st.session_state['page'] == 'inheritance_page':
             tab1, tab2 = st.tabs(["판례검색결과", "참조조문"])
             
             with tab1:
-                st.header("사용자 키워드와 관련된 사건명")
+                st.header(f"{subject}와 관련된 사건명")
                 for _, row in df_results.iterrows():
                     사건번호_encoded = quote(row['사건번호'])  # 사건번호 인코딩
                     판례일련번호_encoded = quote(str(row['판례일련번호'])) # 판례일련번호 인코딩
