@@ -26,11 +26,11 @@ port = port
 database = database
 
 # CSV 파일 로드
-# df_injury = pd.read_csv('data/상해_본문2.csv')
-# df_fraud = pd.read_csv('data/사기_본문2.csv')
-# df_inheritance = pd.read_csv('data/상속_본문2.csv')
-# df_labor = pd.read_csv('data/근로_본문2.csv')
-fraud_content = pd.read_csv('data/사기_본문2.csv')
+# df_injury = pd.read_csv('data/상해_본문2.csv', index_col=False)
+# df_fraud = pd.read_csv('data/사기_본문2.csv', index_col=False)
+# df_inheritance = pd.read_csv('data/상속_본문2.csv', index_col=False)
+# df_labor = pd.read_csv('data/근로_본문2.csv', index_col=False)
+fraud_content = pd.read_csv('data/사기_본문2.csv', index_col=False)
 
 # MySQL 데이터베이스 연결 설정
 engine = create_engine(f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
