@@ -2,12 +2,11 @@ import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
 
-
 OC = 'younwjdtjr'
 target = 'prec'
 url = 'http://www.law.go.kr/DRF/lawSearch.do?'
 data = []
-for i in range(451,676):
+for i in range(1,901):
   params = {
       'OC' : OC,
       'target' : target,
@@ -35,7 +34,7 @@ for i in range(451,676):
         LINK = item.find('.//판례상세링크')
         data.append([ORDER_NUM.text, CASE_NAME.text, CASE_NUM.text, CASE_DATE.text, SCOURT.text, CASE.text, LINK.text])
   else:
-    print('error')
+    print(response.status_code)
 df = pd.DataFrame(data=data, columns=['판례일련번호','사건명','사건번호','선고일자','법원명','사건종류명','판례상세링크'])
-
-df.to_csv('data/list_API.csv', index=False)
+df.info()
+df.to_csv('data/law_list22.csv', index=False)
