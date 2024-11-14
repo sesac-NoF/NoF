@@ -79,19 +79,20 @@ elif st.session_state['page'] == 'fraud_page':
         go_to_page('home')
 
 elif st.session_state['page'] == 'inheritance_page':
-    st.title("상속 페이지")
-    st.write("여기는 상속 페이지입니다.")
-    subject = st.selectbox("주제를 선택하세요:", keywordsdata['주제'])
+    st.title("상속페이지")
+    subject = st.selectbox("👆주제를 선택하세요:", keywordsdata['주제'])
 
     # 선택된 주제에 따른 키워드 버튼 표시
     selected_index =  keywordsdata[keywordsdata['주제'] == subject].index[0]
     keywords = keywordsdata['키워드'][selected_index]
     
-    # 라디오 버튼으로 키워드 선택
-    selected_keyword = st.radio("키워드를 선택하세요:", keywords)
+    # 키워드는 주제선택 참고용자료로 보여주기
+    st.write(f"**{subject}**와 관련된 키워드:")
+
+    st.write(", ".join(keywords[:10]))
 
     # 확인 버튼 클릭 시 진행 표시와 유사도 계산
-    if st.button("확인") and selected_keyword:
+    if st.button("주제선택 완료") :
         # Progress bar와 placeholder 설정
         placeholder = st.empty()
         with placeholder:
@@ -101,9 +102,8 @@ elif st.session_state['page'] == 'inheritance_page':
                 time.sleep(0.5)
 
          # 이미 계산된 inheritance_results에서 주제,키워드로 필터링
-        df_results = inheritance_results[(inheritance_results['주제'] == subject) 
-                                         & (inheritance_results['키워드'] == selected_keyword)].sort_values(by='유사도', ascending=False).head(10)
-        
+        df_results = inheritance_results[inheritance_results['주제'] == subject].sort_values(by='유사도', ascending=False).head(10)
+
         # 결과가 있으면 탭에 표시
         if not df_results.empty:
             tab1, tab2 = st.tabs(["판례검색결과", "참조조문"])

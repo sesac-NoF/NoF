@@ -282,6 +282,7 @@ elif st.session_state['page'] == 'inheritance_page':
     # 데이터베이스 연결 닫기
     cursor.close()
     db_connection.close()
+    st.button("자세한 판례검색 페이지로 이동")
 
     
 
