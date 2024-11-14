@@ -3,10 +3,7 @@ import requests
 import xml.etree.ElementTree as ET
 
 df = pd.read_csv('data/law_list22.csv', index_col=False)
-print(df['판례일련번호'].value_counts().sum())
-print(len(df))
-print(df[['판례일련번호','판례상세링크']].head())
-print(df[['판례일련번호','판례상세링크']].tail())
+
 OC = 'younwjdtjr'
 target = 'prec'
 url = 'http://www.law.go.kr/DRF/lawService.do?'
@@ -20,7 +17,6 @@ for i in range(len(df)):
         'ID' : df['판례일련번호'].iloc[i]
     }
     response = requests.get(url, params=params, timeout=10)
-
     if response.status_code == 200:
         root = ET.fromstring(response.content)
         ORDER_NUM = root.find('.//판례정보일련번호')
@@ -32,7 +28,6 @@ for i in range(len(df)):
         REF_STAT = root.find('.//참조조문')
         REF_CASE = root.find('.//참조판례')
         CASE_CONTENT = root.find('.//판례내용')
-      
         data.append([
                         ORDER_NUM.text,
                         CASE_NUM.text if CASE_NUM is not None else None,
@@ -44,8 +39,7 @@ for i in range(len(df)):
                         REF_CASE.text if REF_CASE is not None else None,
                         CASE_CONTENT.text if CASE_CONTENT is not None else None
                     ])
-        print(i, df['판례일련번호'].iloc[i], ORDER_NUM.text)
     else:
-        print(i,'error')
-df2 = pd.DataFrame(data=data, columns=['판례정보일련번호','사건번호','선고','판결유형','판시사항','판결요지','참조조문','참조판례','판례내용'])
-# df2.to_csv('data/lawService_js.csv', index=False)
+        print('error', response.status_code)
+df_lawservice = pd.DataFrame(data=data, columns=['판례정보일련번호','사건번호','선고','판결유형','판시사항','판결요지','참조조문','참조판례','판례내용'])
+df_lawservice.to_csv('data/lawService_js.csv', index=False)
