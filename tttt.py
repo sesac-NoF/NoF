@@ -186,11 +186,45 @@ if st.button("확인") and selected_keyword:
                 .sort_values(by='참조횟수', ascending=False)
             )
             df_참조조문2['참조조문이름'] = df_참조조문2['참조조문이름'].map(name_mapping)
+            # df_참조조문2['참조조문이름'] = df_참조조문2.apply(
+            #     lambda row: f'<a href="{row["상세링크"]}" target="_blank">{row["참조조문이름"]}</a>', axis=1
+            # )
+            
+            # '참조횟수' 기준 상위 20개 데이터 필터링
+            top_20_df = df_참조조문2.nlargest(20, '참조횟수')
 
-            with st.container():
-                st.write('참조조문 수', len(df_참조조문2))
-                st.dataframe(df_참조조문2) 
-                st.bar_chart(df_참조조문2.set_index('참조조문이름')['참조횟수'][:10])
+            # HTML 링크 추가
+            top_20_df['참조조문이름'] = top_20_df.apply(
+                lambda row: f'<a href="{row["상세링크"]}" target="_blank">{row["참조조문이름"]}</a>', axis=1
+            )
+
+
+            # CSS 스타일 추가
+            st.markdown(
+                """
+                <style>
+                .dataframe-container {
+                    width: 80%; /* 너비를 80%로 설정 */
+                    margin: auto; /* 가운데 정렬 */
+                }
+                .dataframe-container table {
+                    width: 100%; /* 표 너비를 100%로 설정 */
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            # 상위 20개의 필터링된 데이터프레임을 HTML로 표시
+            st.markdown(
+                f"""
+                <div class="dataframe-container">
+                    {top_20_df[['참조조문이름', '참조횟수']].to_html(escape=False, index=False)}
+                </div>
+                """,
+                unsafe_allow_html=True,
+
+            )
+            st.bar_chart(df_참조조문2.set_index('참조조문이름')['참조횟수'][:20], x_label='법령',y_label= '참조횟수', width=200, height=500)
 
 
     else:
