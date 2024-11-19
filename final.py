@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import time
-import ast
+# import ast
 from urllib.parse import quote
 from pyvis.network import Network
 import streamlit.components.v1 as components
@@ -50,7 +50,7 @@ keywordsdata = {
 
 
 # 미리저장한 결과 CSV 파일 불러오기
-inheritance_results = pd.read_csv('data/inheritance_results.csv')
+inheritance_results = pd.read_csv('data/inheritance_results_241118.csv')
 
 
 if 'page' not in st.session_state:
@@ -207,12 +207,17 @@ elif st.session_state['page'] == 'inheritance_page':
         ))
 
         st.markdown(f'''
-        <div style="font-size: 16px;">
-            <strong>카테고리 전체 데이터 수<strong>
-            <span style="font-size: 20px; color: #DA5663;"></br>
-            　<img src="{gavel_icon_url}" width="40" style="vertical-align:middle;">　　{total}</span>
+        <div style="display: flex; align-items: flex-start; font-size: 16px; padding: 10px;">
+            <img src="{gavel_icon_url}" width="40" style="margin-right: 10px;">
+            <div>
+                <strong>전체 데이터 수</strong><br>
+                <span style="font-size: 20px; color: #DA5663;">
+                    {total}
+                </span>
+            </div>
         </div>
         ''', unsafe_allow_html=True)
+
         st.plotly_chart(fig, use_container_width=True)
 
 
@@ -272,22 +277,23 @@ elif st.session_state['page'] == 'inheritance_page':
         # Streamlit에서 Plotly 차트 표시
         st.markdown(f'''
         <div style="display: flex; justify-content: space-between; font-size: 16px;">
-            <div style="flex: 1; padding: 10px;align-items: center;">
-                <strong>　　최다 빈출 법원명</strong>
-                <span style="font-size: 15px; color: #DA5663; display: inline-flex; align-items: center;">
-                    <img src="{law_icon_url}" width="40" style="vertical-align: middle; margin-right: 10px;">
-                    <div style="line-height: 1.2;">
-                        <span style="display: block;">대법원</span>
-                        <span style="display: block;">2,253회</span>
-                    </div>
-                </span>
+            <div style="flex: 1; padding: 10px; display: flex; align-items: flex-start;">
+                <img src="{law_icon_url}" width="40" style="margin-right: 10px;">
+                <div style="line-height: 1.2;">
+                    <strong>최다 빈출 법원명</strong><br>
+                    <span style="font-size: 15px; color: #DA5663;">
+                        대법원 2,253회
+                    </span>
+                </div>
             </div>
-            <div style="flex: 1; padding: 10px;">
-                <strong>최다 빈출 재판장</strong>
-                <span style="font-size: 18px; color: #29283d;">
-                    <br>　
-                    <img src="{people_icon_url}" width="40" style="vertical-align:middle;">　박만호
-                </span>
+            <div style="flex: 1; padding: 10px; display: flex; align-items: flex-start;">
+                <img src="{people_icon_url}" width="40" style="margin-right: 10px;">
+                <div>
+                    <strong>최다 빈출 재판장</strong><br>
+                    <span style="font-size: 18px; color: #29283d;">
+                        박만호
+                    </span>
+                </div>
             </div>
         </div>
         ''', unsafe_allow_html=True)
